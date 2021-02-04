@@ -349,3 +349,7 @@ a.ui-button:active,
 .stats-kpi-number{
   font-weight: bold;
 }
+.stats-kpi-icon {
+  font-size: 12px;
+  padding-top: 4px;
+}
