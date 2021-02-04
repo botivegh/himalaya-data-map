@@ -1,0 +1,351 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.marker {
+  width: 53px;
+  height: 53px;
+  background-size: 50px 50px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border-radius: 50px;
+}
+.marker span {
+  text-align: center;
+  color: white;
+  position: absolute;
+  bottom: 0;
+  left: 5px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: tomato;
+}
+.marker:hover {
+  background-size: 53px 53px;
+  cursor: pointer;
+}
+
+#toolbar {
+  visibility: hidden;
+  height: calc(100% - 100px);
+  width: 300px;
+  margin-left: 22.5px;
+  border-radius: 0 0 5px 5px;
+  background: rgba(255, 255, 255, 0.39);
+  position: absolute;
+  top: 50px;
+  z-index: 11;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  /* transition: height 1s, width 1s, padding 1s, visibility 1s, opacity 0.5s ease-out; */
+}
+#toolbar-button {
+  font-weight: bold;
+  background-color: rgb(255, 255, 255);
+  background-image: url("./assets//images//marker_peak.png");
+  background-size: 35px;
+  background-repeat: no-repeat;
+  background-position: center;
+  font-size: 16px;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  border: 0px;
+  padding: 0px;
+  position: absolute;
+  z-index: 100;
+  border-radius: 5px;
+  height: 43px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+  overflow: hidden;
+  top: 45px;
+  left: 22.5px;
+  line-height: 43px;
+}
+#toolbar-button:focus {
+  outline: none;
+}
+
+#toolbar-button:hover {
+  /* transform: scale(1.03); */
+}
+#toolbar-button.active {
+  left: 300px;
+  background-image: none;
+  top: 35px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50px;
+  background-color: #292b2c;
+}
+#toolbar-button.active::before {
+  color: #fff;
+  font-weight: 300;
+  content: "✕";
+  padding-left: 10px;
+  font-size: 35px;
+}
+#peak-img {
+  min-width: 100%;
+  background-image: url("https://static.toiimg.com/photo/70723727/everest.jpg?width=748&resize=4");
+  background-position: top;
+  /* MAYBE TOP IS BETTER CHOICE */
+  background-repeat: none;
+  background-size: cover;
+  height: 150px;
+  object-fit: cover;
+  position: relative;
+}
+#peak-name {
+  /* MAYBE TOP IS BETTER CHOICE */
+  display: flex;
+  justify-content: center;
+  height: 50px;
+  background-color: white;
+  position: absolute;
+  border-radius: 5px;
+  text-align: center;
+  bottom: -40px;
+  width: calc(100% - 32px);
+  margin: 16px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+#peak-name-text {
+  /* MAYBE TOP IS BETTER CHOICE */
+  margin: auto;
+}
+#tool-main-content {
+  margin-top: 40px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 5px;
+  min-height: 300px;
+}
+
+/* TOP 5 STORYTELLER SECTION */
+#top5-container {
+  position: absolute;
+  display: flex;
+  background-color: #fff;
+  width: 425px;
+  height: 100px;
+  bottom: 10px;
+  left: calc(50% - 212.5px);
+  border-radius: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  padding: 0 8px;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+.top5er {
+  position: relative;
+  padding: 2px;
+  width: 85px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.top5er:hover {
+  background-color: #f1f1f1;
+}
+
+.top5er-pic {
+  background-image: url("https://static.toiimg.com/photo/70723727/everest.jpg?width=748&resize=4");
+  background-position: center;
+  background-size: 60px;
+  display: inline-block;
+  /* MAYBE TOP IS BETTER CHOICE */
+  background-repeat: none;
+  background-size: cover;
+  height: 60px;
+  width: 60px;
+  border-radius: 100px;
+  object-fit: cover;
+  position: relative;
+}
+.top5er span {
+  position: absolute;
+  left: 8px;
+  bottom: 20px;
+  width: 65px;
+}
+.top5er-text {
+  font-weight: bold;
+  font-size: 11px;
+}
+
+@media screen and (max-width: 625px) {
+  #toolbar {
+    margin: 0;
+    top: 90px;
+    background-color: #aeb0b3;
+  }
+
+  .toolbar {
+    width: 100% !important;
+    height: calc(100% - 90px) !important;
+  }
+  #add-to-download {
+    display: none;
+  }
+}
+.mapbox-improve-map {
+  display: none;
+}
+
+#location-search {
+  position: absolute;
+  width: 60%;
+  margin-left: -30%;
+  top: 45px;
+  left: 50%;
+  z-index: 10;
+}
+
+@media screen and (min-width: 1000px) {
+  #location-search,
+  #location-search-stats {
+    width: 500px;
+    margin-left: -250px;
+  }
+}
+@media screen and (max-width: 1300px) {
+  .location-search-toolbox-active {
+    margin-right: 0px;
+    right: 22.5px !important;
+    width: 272.5px !important;
+    left: auto !important;
+  }
+}
+
+#searchTextField {
+  background: url(./assets/images/magni.png) white no-repeat;
+  box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%);
+  text-overflow: ellipsis;
+  background-size: 27px;
+  background-position: 5px;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  padding-left: 43px;
+  display: block;
+  font-size: 14px;
+  min-height: 43px;
+  text-align: left;
+}
+
+.ui-autocomplete {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+  max-height: 200px;
+  max-width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 0px 0px 5px 5px;
+}
+
+.ui-menu-item {
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #a7a5ac;
+  font-family: Proxima Nova, Trebuchet MS, sans-serif !important;
+  padding: 0 0 0 7px;
+  border-bottom: 0.5px solid #f7f7f7;
+}
+
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active,
+a.ui-button:active,
+.ui-button:active,
+.ui-button.ui-state-active:hover {
+  background-color: #ffffff;
+  border: 0;
+  color: #73b1e3;
+}
+
+#flag-carousel img {
+  height: 30px;
+}
+
+.nav-pills .nav-link {
+  background: rgb(236, 236, 236);
+  color: #292b2c;
+  border-radius: 0;
+}
+.nav-pills .nav-link a {
+  color: #292b2c;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: #292b2c;
+  font-weight: bold;
+  background: #fff;
+}
+
+.stats-kpi {
+  margin: 8px;
+  border: thin rgb(214, 214, 214) solid;
+  border-radius: 4px;
+  height: 60px;
+}
+.stats-kpi-icon {
+  border-right: solid thin rgb(214, 214, 214);
+  background: #dbdbdb;
+}
+
+#download-screen-shot {
+  z-index: 100;
+  position: absolute;
+  background-color: #fff;
+  right: 10px;
+  bottom: 105px;
+  width: 29px;
+  height: 29px;
+  border-radius: 4px;
+  text-align: center;
+  cursor: pointer;
+  padding-top: 2px;
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+}
+#download-screen-shot:hover {
+  background-color: #f7f7f7;
+}
+.click-popup.mapboxgl-popup {
+  height: 90px !important;
+  width: 90px !important;
+  background-color: transparent;
+  background-size: 90px 90px;
+  background-image: url("/assets/images/capture.png");
+}
+.mapboxgl-popup-close-button,
+.mapboxgl-popup-tip,
+.click-popup .mapboxgl-popup-content {
+  display: none;
+}
+.hover-popup {
+  color: white;
+  height: 30px;
+}
+.hover-popup .mapboxgl-popup-content {
+  background-color: rgba(0, 0, 0, 0.63);
+  font-size: 11px;
+  padding: 4px;
+  border-radius: 4px;
+}
+.stats-kpi-sublabel {
+  font-size: 12px;
+  padding-top: 4px;
+}
+.stats-kpi-number{
+  font-weight: bold;
+}
