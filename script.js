@@ -195,37 +195,35 @@ map.on("load", function () {
 //   );
 
 /////////////// LOCATION SEARCH
-
-$.getJSON("/Himalayan Database/GeoData/peaks_search.json", function (data) {
-  $("#searchTextField").autocomplete({
-    source: data,
-    appendTo: "#location-search",
-    open: function (event, ui) {
-      $(".ui-autocomplete").off("menufocus hover mouseover mouseenter");
-    },
-    minLength: 0,
-    select: function (event, ui) {
-      var countrycenter = [ui.item.id[1], ui.item.id[0]];
-
-      map.zoomTo(7, { duration: 100 });
-
-      //map.setPitch(0, { duration: 1000 });
-      //map.flyTo({
-      map.easeTo({
-        center: countrycenter,
-        pitch: 80,
-        zoom: 10,
-        // bearing: -60,
-        duration: 4000,
-      });
-      //location_search_stats.style.visibility="visible";
-    },
-  });
+var select_location = new SlimSelect({
+  select: "#location-search",
+  placeholder: "Search for peak of Nepal",
 });
 
-jQuery.ui.autocomplete.prototype._resizeMenu = function () {
-  var ul = this.menu.element;
-  ul.outerWidth(this.element.outerWidth());
+$.getJSON("./assets/data/peaks_search.json", function (data) {
+  //https://trendtype-web-app-data.s3-eu-west-1.amazonaws.com/pharmacy_explorer/pharma_city_search.json
+  select_location.setData(data);
+  select_location.set(null);
+});
+
+document.getElementById("location-search").onchange = function () {
+  var selected = select_location.selected() ;
+  if (selected != null) {
+    map.easeTo({
+      center: [selected.split(",")[1], selected.split(",")[0]],
+      pitch: 80,
+      zoom: 10,
+      // bearing: -60,
+      duration: 4000,
+    });
+    $.getJSON("/Himalayan Database/GeoData/peaks.geojson", function (data) {
+      var selectedPeak = data.features.filter(
+        (el) => el.properties.peakid == selected.split(",")[2]
+      )[0];
+      ToggleToolBox(true);
+      setSidebarData(selectedPeak);
+    });
+  }
 };
 
 //// MODIFY DOM
@@ -234,7 +232,7 @@ jQuery.ui.autocomplete.prototype._resizeMenu = function () {
 var toolbar = document.getElementById("toolbar");
 var toolbar_header = document.getElementById("toolbar-header");
 var toolbar_button = document.getElementById("toolbar-button");
-var location_search = document.getElementById("location-search");
+var location_search = document.getElementById("location-search-container");
 
 document.getElementById("toolbar-button").onclick = function () {
   ToggleToolBox();
@@ -293,7 +291,7 @@ function setSidebarData(selectedPeak) {
       selectedPeak.properties.most_pop_route;
     /// About:
     document.getElementById("story-about").innerHTML =
-      "<hr/> <strong>About</strong> <br/> " + selectedPeak.properties.location;
+      "<hr/> <strong>About</strong> <br/> " + selectedPeak.properties.about;
 
     /// Add flag to the caroussel!
     // $(".flag-carousel").slick("removeSlide", null, null, true);
@@ -368,6 +366,7 @@ function setSidebarData(selectedPeak) {
 
     var layout = {
       showlegend: true,
+      hovermode: "x unified",
       legend: {
         orientation: "h",
       },
@@ -379,8 +378,8 @@ function setSidebarData(selectedPeak) {
       },
     };
 
-    TESTER = document.getElementById("tester");
-    Plotly.newPlot("tester", data, layout);
+    TESTER = document.getElementById("time-plot");
+    Plotly.newPlot("time-plot", data, layout);
   }
 }
 

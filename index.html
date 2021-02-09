@@ -40,6 +40,7 @@
       type="text/css"
       href="assets/slick/slick/slick-theme.css"
     />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css" rel="stylesheet"></link>
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   </head>
@@ -50,7 +51,9 @@
 
     <div id="toolbar" class="toolbar enableBlur">
       <!-- IMAGE -->
-      <div id="peak-img" aria-label="Image of selected peak">
+      <div id="toolbar-inner">
+      <div id="toolbar-head">
+              <div id="peak-img" aria-label="Image of selected peak">
         <!-- HEIGHT BADGE ON IMAGE -->
         <span id="peak-height-badge" class="badge badge-danger m-3">111</span>
         <!-- <div id="peak-locate-badge" class="badge badge-danger mt-6">locate</div> -->
@@ -60,10 +63,12 @@
           <div id="peak-name-text" class="h5"></div>
         </div>
       </div>
+      </div>
+
       <!-- TOOLBAR CONTENT - TABS -->
       <div id="tool-main-content">
         <ul
-          class="nav nav-pills mb-3 nav-justified"
+          class="nav nav-pills nav-justified"
           id="pills-tab"
           role="tablist"
         >
@@ -166,7 +171,7 @@
                   
               <strong>Time</strong>
 
-              <div id="tester" style="width:300px ; height:250px;"></div>
+              <div id="time-plot" style="width:300px ; height:250px;"></div>
 
 
                 </div>
@@ -184,13 +189,17 @@
 
 
           </div>
+
+      </div>
+
         </div>
       </div>
     </div>
 
     <!-- LOCATION SEARCH BAR AND LOCATOR -->
-    <div id="location-search">
-      <input id="searchTextField" type="text" placeholder="Search for a peak" />
+    <div id="location-search-container">
+      <select id="location-search">
+      </select>
     </div>
     <!-- TOP 5 STORYTELLER -->
 
@@ -252,6 +261,9 @@
       type="text/javascript"
       src="assets/slick/slick/slick.min.js"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.js"></script>
+
+
     <script src="script.js"></script>
   </body>
 </html>
