@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Nepal Himalayas Map</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js"></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+      integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="assets/slick/slick/slick.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/mapbox-gl-animated-popup@v0.1.4/dist/mapbox-gl-animated-popup.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="assets/slick/slick/slick-theme.css"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="./index.html">
+        <img
+          src="/assets/images/marker_peak_blue.png"
+          width="30"
+          height="30"
+          class="d-inline-block align-top"
+          alt=""
+        />
+        Himalayas Map</a
+      >
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="./index.html">Home</a>
+          <a class="nav-item nav-link active" href="#"
+            >Map <span class="sr-only">(current)</span></a
+          >
+          <a class="nav-item nav-link" href="#">About</a>
+          <a class="nav-item nav-link" target="_blank" href="https://github.com/botivegh"
+            ><i class="fab fa-github"></i
+          ></a>
+        </div>
+      </div>
+    </nav>
+    <!-- <div id="landing-page" class="fullpage-content">
+      Land
+    </div> -->
+    <div id="map-page" class="fullpage-content">
+      <div id="loading-screen"></div>
+      <div id="loading-progress">
+        <div>Loading...</div>
+      </div>
+
+
+      <!-- TOOLBAR -->
+      <div id="toolbar-button"></div>
+
+      <div id="toolbar" class="toolbar enableBlur">
+        <!-- IMAGE -->
+        <div id="toolbar-inner">
+          <div id="toolbar-head">
+            <div id="peak-img" aria-label="Image of selected peak">
+              <!-- HEIGHT BADGE ON IMAGE -->
+              <div id="peak-height-locate" class="p-2">
+                <span id="peak-height-badge" class="badge badge-danger"
+                  >111</span
+                >
+                <br />
+                <i
+                  id="fly-button"
+                  class="icon-button fas fa-crosshairs"
+                  data-location=""
+                ></i>
+              </div>
+              <!-- <div id="peak-locate-badge" class="badge badge-danger mt-6">locate</div> -->
+
+              <!-- NAME OF PEAK -->
+              <div id="peak-name">
+                <div id="peak-name-text" class="h5"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TOOLBAR CONTENT - TABS -->
+          <div id="tool-main-content">
+            <ul
+              class="nav nav-pills nav-justified"
+              id="pills-tab"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  class="nav-link  active"
+                  id="pills-stats-tab"
+                  data-toggle="pill"
+                  href="#pills-stats"
+                  role="tab"
+                  aria-controls="pills-stats"
+                  aria-selected="true"
+                  >Statistics</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="pills-story-tab"
+                  data-toggle="pill"
+                  href="#pills-story"
+                  role="tab"
+                  aria-controls="pills-story"
+                  aria-selected="false"
+                  >About</a
+                >
+              </li>
+            </ul>
+            <div class="tab-content scrollbox" id="pills-tabContent">
+              <div
+                class="tab-pane fade show active"
+                id="pills-stats"
+                role="tabpanel"
+                style="position: relative"
+                aria-labelledby="pills-stats-tab"
+              >
+                <div id="stats-kpi-container pt-2">
+                  <strong>Total Attempts</strong>
+                  <div id="attempts-total" class="h4 m-0">100</div>
+                  <hr />
+
+                  <strong>Overview</strong>
+                  <!-- success -->
+                  <div class="stats-kpi row">
+                    <div
+                      class="stats-kpi-icon col-4"
+                      style="background-color: #5cb85c; color: white"
+                    >
+                      Success <br />
+                      <img height="35px" src="./assets/images/success.png" />
+                    </div>
+                    <div class="stats-kpi-text col-8 row m-0">
+                      <div class="stats-kpi-sublabel col-6">Rate</div>
+                      <div class="stats-kpi-sublabel col-6">Total</div>
+                      <div id="success-rate" class="stats-kpi-number col-6">
+                        22%
+                      </div>
+                      <div id="success-total" class="stats-kpi-number col-6">
+                        12341
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Oxigen Support -->
+                  <div class="stats-kpi row">
+                    <div
+                      class="stats-kpi-icon col-4"
+                      style="background-color: #5bc0de; color: white"
+                    >
+                      O<sub>2</sub> Support <br />
+                      <img
+                        height="25px"
+                        src="./assets/images/o2.png"
+                        class="mt-1"
+                      />
+                    </div>
+                    <div class="stats-kpi-text col-8 row m-0">
+                      <div class="stats-kpi-sublabel col-6">Rate</div>
+                      <div class="stats-kpi-sublabel col-6">Total</div>
+                      <div id="o2-rate" class="stats-kpi-number col-6">22%</div>
+                      <div id="o2-total" class="stats-kpi-number col-6">
+                        12341
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- DEATH -->
+                <div class="stats-kpi row">
+                  <div
+                    class="stats-kpi-icon col-4"
+                    style="background-color: #292b2c; color: white"
+                  >
+                    Death <br />
+                    <i class="fas fa-ribbon fa-2x"></i>
+                  </div>
+                  <div class="stats-kpi-text col-8 row m-0">
+                    <div class="stats-kpi-sublabel col-6">Rate</div>
+                    <div class="stats-kpi-sublabel col-6">Total</div>
+                    <div id="death-rate" class="stats-kpi-number col-6">
+                      22%
+                    </div>
+                    <div id="death-total" class="stats-kpi-number col-6">
+                      12341
+                    </div>
+                  </div>
+                </div>
+                <hr />
+                <strong>Time Series</strong>
+                <div id="time-plot" style="height: 250px"></div>
+                <hr />
+                <strong>Age Distribution</strong>
+                <div id="age-plot" style="height: 200px"></div>
+                <hr />
+                <strong>Gender Ratio</strong>
+                <!-- <div class="chart-label">Gender</div> -->
+                <div id="gender-plot" style="height: 125px"></div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="pills-story"
+                role="tabpanel"
+                aria-labelledby="pills-story-tab"
+              >
+                <div id="tab-story-content">
+                  <div id="story-first-sub"></div>
+                  <div id="story-first-year"></div>
+                  <div id="story-route"></div>
+                  <div id="story-about"></div>
+                </div>
+
+                <!-- Caroussel -->
+
+                <div id="flag-carousel" class="flag-carousel"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="map-container">
+        <!-- LOCATION SEARCH BAR AND LOCATOR -->
+        <div id="location-search-container">
+          <select id="location-search"></select>
+        </div>
+        <!-- TOP 5 STORYTELLER -->
+
+        <div id="top5-container">
+          <span id="top5er-badge" class="badge badge-dark">Top 5</span>
+          <!-- first -->
+          <div class="top5er" onclick="Top5Story(1)">
+            <div
+              class="top5er-pic"
+              style="background-image: url(./assets/images/peakimg/EVER.jpg)"
+            ></div>
+            <span class="badge badge-danger">8850m </span>
+            <div class="top5er-text">Everest</div>
+          </div>
+          <!-- second -->
+          <div class="top5er" onclick="Top5Story(2)">
+            <div
+              class="top5er-pic"
+              style="background-image: url(./assets/images/peakimg/KANG.jpg)"
+            ></div>
+            <span class="badge badge-danger">8586m </span>
+            <div class="top5er-text">Kangchenjunga</div>
+          </div>
+          <!-- third -->
+          <div class="top5er" onclick="Top5Story(3)">
+            <div
+              class="top5er-pic"
+              style="background-image: url(./assets/images/peakimg/LHOT.jpg)"
+            ></div>
+            <span class="badge badge-danger">8516m </span>
+            <div class="top5er-text">Lhotse</div>
+          </div>
+          <!-- fourth -->
+          <div class="top5er" onclick="Top5Story(4)">
+            <div
+              class="top5er-pic"
+              style="background-image: url(./assets/images/peakimg/YALU.jpg)"
+            ></div>
+            <span class="badge badge-danger">8505m </span>
+            <div class="top5er-text">Yalung Kang</div>
+          </div>
+          <!-- fifth -->
+          <div class="top5er" onclick="Top5Story(5)">
+            <div
+              class="top5er-pic"
+              style="background-image: url(./assets/images/peakimg/MAKA.jpg)"
+            ></div>
+            <span class="badge badge-danger">8485m </span>
+            <div class="top5er-text">Makalu</div>
+          </div>
+        </div>
+        <!-- Download Button -->
+        <a id="download-screen-shot" download="HimalayasMap_screenshot.png">
+          <i class="fas fa-camera"></i
+        ></a>
+
+        <div id="map"></div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.min.js"
+      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/slick/slick/slick.min.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.0/slimselect.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

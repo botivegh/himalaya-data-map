@@ -18,7 +18,7 @@ var popupClick = new mapboxgl.Popup({
   className: "click-popup",
   closeButton: false,
   closeOnClick: false,
-  offset: [0, 0],
+  offset: [0, 10],
 });
 // var popupClick = new AnimatedPopup({
 //   className: "click-popup",
@@ -38,10 +38,10 @@ mapboxgl.accessToken =
   "pk.eyJ1IjoiYm90aXZlZ2gxMSIsImEiOiJjazdydGI1NXAwYTJ4M25zZnNuanhoOGVtIn0.ehZ8tfymMjbNyAPJ2o2lhQ";
 var map = new mapboxgl.Map({
   container: "map",
-  zoom: 11.5,
+  zoom: 7,
   center: [86.925782, 27.987029],
-  pitch: 75,
-  bearing: 70,
+  pitch: 50,
+  bearing: 0,
   attributionControl: false,
   preserveDrawingBuffer: true,
   style: "mapbox://styles/botivegh11/ckl07lvlf0a3117o1sxfyh3ju",
@@ -62,7 +62,7 @@ map.on("load", function () {
 
   ///////// ADD PEAKS
   map.loadImage(
-    "http://127.0.0.1:5500/assets/images/marker_peak_blue_red.png",
+    "http://127.0.0.1:5500/assets/images/newMarker.png",
     // Add an image to use as a custom marker
     function (error, image) {
       if (error) throw error;
@@ -87,7 +87,7 @@ map.on("load", function () {
           "text-field": ["get", "heightm"],
           "text-variable-anchor": ["top"],
           "text-justify": "center",
-          "text-radial-offset": 0.7,
+          "text-radial-offset": 0.3,
           "text-size": 11,
           //'font-scale': 0.8,
           "text-font": ["Roboto Black", "Arial Unicode MS Regular"],
@@ -166,8 +166,13 @@ map.on("load", function () {
 map.on("data", function (e) {
   if (e.dataType === "source" && e.sourceId === "peaks") {
     document.getElementById("loading-screen").style.visibility = "hidden";
+    document.getElementById("loading-progress").style.visibility = "hidden";
     document.getElementById("map-container").style.filter = "none";
   }
+});
+/// SELECT EVEREST AT FIRST LOAD
+map.once("idle", () => {
+  Top5Story(1, true);
 });
 
 //////////////// Depreciated markers
@@ -220,7 +225,7 @@ document.getElementById("location-search").onchange = function () {
     map.easeTo({
       center: [selected.split(",")[1], selected.split(",")[0]],
       pitch: 80,
-      zoom: 10,
+      zoom: 12,
       // bearing: -60,
       duration: 4000,
     });
@@ -244,20 +249,23 @@ var location_search = document.getElementById("location-search-container");
 
 document.getElementById("toolbar-button").onclick = function () {
   ToggleToolBox();
+  Plotly.Plots.resize("time-plot");
+  Plotly.Plots.resize("gender-plot");
+  Plotly.Plots.resize("age-plot");
 };
 ///// TOGGLE
 function ToggleToolBox(forceOpen) {
   if (forceOpen == true) {
-    toolbar.style.visibility = "visible";
+    toolbar.style.display = "block";
     toolbar_button.className = "active";
     location_search.className = "location-search-toolbox-active";
   } else {
-    if (toolbar.style.visibility == "visible") {
-      toolbar.style.visibility = "hidden";
+    if (toolbar.style.display == "block") {
+      toolbar.style.display = "none";
       toolbar_button.className = "";
       location_search.className = "";
     } else {
-      toolbar.style.visibility = "visible";
+      toolbar.style.display = "block";
       toolbar_button.className = "active";
       location_search.className = "location-search-toolbox-active";
     }
@@ -266,6 +274,8 @@ function ToggleToolBox(forceOpen) {
 
 //// SET SIDEBAR - TOOLBAR
 function setSidebarData(selectedPeak) {
+  var coordinates = [selectedPeak.properties.lng, selectedPeak.properties.lat];
+
   document.getElementById("peak-img").style.backgroundImage =
     'url("./assets/images/peakimg/' +
     selectedPeak.properties.peakid +
@@ -283,8 +293,10 @@ function setSidebarData(selectedPeak) {
     selectedPeak.properties.count_mem_success == null ||
     selectedPeak.properties.count_mem_success == "null"
   ) {
-    document.getElementById("story-first-sub").innerHTML = "UNCLIMBED";
+    document.getElementById("story-first-sub").innerHTML =
+      "<div class='unclimbed'>Unclimbed</div>";
     document.getElementById("story-first-year").innerHTML = "";
+    document.getElementById("story-route").innerHTML = "";
     document.getElementById("story-about").innerHTML = "";
     // $(".flag-carousel").slick("removeSlide", null, null, true);
   } else {
@@ -298,11 +310,16 @@ function setSidebarData(selectedPeak) {
       selectedPeak.properties.pyear;
     /// Popular Route
     document.getElementById("story-route").innerHTML =
-      "<hr/><strong>Most Popular Route</strong> <br/> " +
-      selectedPeak.properties.most_pop_route;
+      selectedPeak.properties.most_pop_route != null
+        ? "<hr/><strong>Most Popular Route</strong> <br/> " +
+          selectedPeak.properties.most_pop_route
+        : "";
+
     /// About:
     document.getElementById("story-about").innerHTML =
-      "<hr/> <strong>About</strong> <br/> " + selectedPeak.properties.about;
+      selectedPeak.properties.about != null
+        ? "<hr/> <strong>About</strong> <br/> " + selectedPeak.properties.about
+        : "";
 
     /// Add flag to the caroussel!
     // $(".flag-carousel").slick("removeSlide", null, null, true);
@@ -356,6 +373,7 @@ function setSidebarData(selectedPeak) {
       mode: "lines",
       line: {
         dash: "solid",
+        color: "#337ab7",
 
         width: 2,
       },
@@ -368,7 +386,7 @@ function setSidebarData(selectedPeak) {
       line: {
         dash: "spline",
         width: 2,
-        color: "green",
+        color: "#5cb85c",
       },
     };
     var trace3 = {
@@ -379,7 +397,7 @@ function setSidebarData(selectedPeak) {
       line: {
         dash: "spline",
         width: 2,
-        color: "black",
+        color: "#292b2c",
       },
     };
 
@@ -514,26 +532,32 @@ function setSidebarData(selectedPeak) {
       (config = { responsive: true, displayModeBar: false, scrollZoom: false })
     );
   }
+  popupClick.setLngLat(coordinates).setHTML("click").addTo(map);
 }
 
 // VISIT TO TOP5 PEAKS!!
 
-function Top5Story(rank) {
+function Top5Story(rank, first) {
   map_rank_id = { 1: "EVER", 2: "KANG", 3: "LHOT", 4: "YALU", 5: "MAKA" };
 
   $.getJSON("/assets/data/peaks.geojson", function (data) {
     var selectedPeak = data.features.filter(
       (el) => el.properties.peakid == map_rank_id[rank]
     )[0];
+    console.log(first);
+    if (first == true) {
+      setSidebarData(selectedPeak);
+    } else {
+      setSidebarData(selectedPeak);
+      ToggleToolBox(true);
+    }
     map.easeTo({
       center: selectedPeak.geometry.coordinates,
       pitch: 80,
       zoom: 12,
+      bearing: 40,
       duration: 4000,
     });
-
-    setSidebarData(selectedPeak);
-    ToggleToolBox(true);
   });
 }
 // Caroussel
@@ -588,3 +612,28 @@ observer.observe(targetNode, { attributes: true, childList: true });
 // // el.style.width = "50px";
 // // el.style.height = "50px";
 // // new mapboxgl.Marker(el).setLngLat([86.925782, 27.987029]).addTo(map);
+
+// var buttons = document.getElementsByTagName('button');
+
+// Array.prototype.forEach.call(buttons, function(b){
+//   b.addEventListener('click', createRipple);
+// })
+
+// function createRipple(e)
+// {
+//   if(this.getElementsByClassName('ripple').length > 0)
+//     {
+//       this.removeChild(this.childNodes[1]);
+//     }
+
+//   var circle = document.createElement('div');
+//   this.appendChild(circle);
+
+//   var d = Math.max(this.clientWidth, this.clientHeight);
+//   circle.style.width = circle.style.height = d + 'px';
+
+//   circle.style.left = e.clientX - this.offsetLeft - d / 2 + 'px';
+//   circle.style.top = e.clientY - this.offsetTop - d / 2 + 'px';
+
+//   circle.classList.add('ripple');
+// }
