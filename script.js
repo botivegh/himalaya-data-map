@@ -44,8 +44,8 @@ var map = new mapboxgl.Map({
   bearing: 70,
   attributionControl: false,
   preserveDrawingBuffer: true,
-  // style: "mapbox://styles/botivegh11/ck7rxaiee0lpb1holaqo8i5j2",
-  style: "mapbox://styles/mapbox/satellite-v9",
+  style: "mapbox://styles/botivegh11/ckl07lvlf0a3117o1sxfyh3ju",
+  //style: "mapbox://styles/mapbox/satellite-v9",
 
   //style: "mapbox://styles/mapbox/outdoors-v10?optimize=true",
 });
@@ -53,12 +53,12 @@ var map = new mapboxgl.Map({
 map.addControl(new mapboxgl.NavigationControl(), (position = "bottom-right"));
 
 map.on("load", function () {
-  map.addSource("mapbox-dem", {
-    type: "raster-dem",
-    url: "mapbox://mapbox.mapbox-terrain-dem-v1",
-    tileSize: 512,
-    maxzoom: 10,
-  });
+  //   map.addSource("mapbox-dem", {
+  //     type: "raster-dem",
+  //     // url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+  //     tileSize: 512,
+  //     maxzoom: 10,
+  //   });
 
   ///////// ADD PEAKS
   map.loadImage(
@@ -70,7 +70,7 @@ map.on("load", function () {
 
       map.addSource("peaks", {
         type: "geojson",
-        data: "http://127.0.0.1:5500/Himalayan Database/GeoData/peaks.geojson",
+        data: "http://127.0.0.1:5500/assets/data/peaks.geojson",
       });
 
       // Add a layer showing the peaks.
@@ -126,7 +126,7 @@ map.on("load", function () {
     var id = e.features[0].properties.peakid;
     popupClick.setLngLat(coordinates).setHTML("click").addTo(map);
     /// Mapbox not giving the array format properties as array so I need to request the data angain to get it in the proper format
-    $.getJSON("/Himalayan Database/GeoData/peaks.geojson", function (data) {
+    $.getJSON("/assets/data/peaks.geojson", function (data) {
       var selectedPeak = data.features.filter(
         (el) => el.properties.peakid == id
       )[0];
@@ -148,7 +148,7 @@ map.on("load", function () {
   // add markers to map https://jsonkeeper.com/b/A71V
 
   // add the DEM source as a terrain layer with exaggerated height
-  map.setTerrain({ source: "mapbox-dem", exaggeration: 1 });
+  //map.setTerrain({ source: "mapbox-dem", exaggeration: 1 });
 
   // add a sky layer that will show when the map is highly pitched
   map.addLayer({
@@ -162,10 +162,18 @@ map.on("load", function () {
   });
 });
 
+//Loading screen, it is waiting for the pharmacies source to load
+map.on("data", function (e) {
+  if (e.dataType === "source" && e.sourceId === "peaks") {
+    document.getElementById("loading-screen").style.visibility = "hidden";
+    document.getElementById("map-container").style.filter = "none";
+  }
+});
+
 //////////////// Depreciated markers
 
 // $.getJSON(
-//     "http://127.0.0.1:5500/Himalayan Database/GeoData/peaks.geojson",
+//     "http://127.0.0.1:5500/assets/data/peaks.geojson",
 //     function (data) {
 //       var geojson = data; // JSON result in `data` variable
 //       geojson.features.forEach(function (marker) {
@@ -207,7 +215,7 @@ $.getJSON("./assets/data/peaks_search.json", function (data) {
 });
 
 document.getElementById("location-search").onchange = function () {
-  var selected = select_location.selected() ;
+  var selected = select_location.selected();
   if (selected != null) {
     map.easeTo({
       center: [selected.split(",")[1], selected.split(",")[0]],
@@ -216,7 +224,7 @@ document.getElementById("location-search").onchange = function () {
       // bearing: -60,
       duration: 4000,
     });
-    $.getJSON("/Himalayan Database/GeoData/peaks.geojson", function (data) {
+    $.getJSON("/assets/data/peaks.geojson", function (data) {
       var selectedPeak = data.features.filter(
         (el) => el.properties.peakid == selected.split(",")[2]
       )[0];
@@ -259,14 +267,17 @@ function ToggleToolBox(forceOpen) {
 //// SET SIDEBAR - TOOLBAR
 function setSidebarData(selectedPeak) {
   document.getElementById("peak-img").style.backgroundImage =
-    'url("' +
-    selectedPeak.properties.photos +
-    '"), url("./assets/images/placeholder2.jpg")';
+    'url("./assets/images/peakimg/' +
+    selectedPeak.properties.peakid +
+    '.jpg"), url("./assets/images/placeholder1.jpg")';
   document.getElementById("peak-height-badge").innerHTML =
     selectedPeak.properties.heightm + "m";
   document.getElementById("peak-name-text").innerHTML =
     selectedPeak.properties.pkname;
-
+  document.getElementById("fly-button").dataset.location = [
+    selectedPeak.properties.lng,
+    selectedPeak.properties.lat,
+  ];
   //// SET DATA ON STORY TAB
   if (
     selectedPeak.properties.count_mem_success == null ||
@@ -349,7 +360,6 @@ function setSidebarData(selectedPeak) {
         width: 2,
       },
     };
-
     var trace2 = {
       x: selectedPeak.properties.lineX,
       y: selectedPeak.properties.lineY_success,
@@ -361,8 +371,19 @@ function setSidebarData(selectedPeak) {
         color: "green",
       },
     };
+    var trace3 = {
+      x: selectedPeak.properties.lineX,
+      y: selectedPeak.properties.lineY_death,
+      name: "death",
+      mode: "lines",
+      line: {
+        dash: "spline",
+        width: 2,
+        color: "black",
+      },
+    };
 
-    var data = [trace1, trace2];
+    var data = [trace1, trace2, trace3];
 
     var layout = {
       showlegend: true,
@@ -372,14 +393,126 @@ function setSidebarData(selectedPeak) {
       },
       margin: {
         l: 30,
-        r: 20,
+        r: 30,
         b: 30,
-        t: 20,
+        t: 15,
+      },
+    };
+    Plotly.newPlot(
+      "time-plot",
+      data,
+      layout,
+      (config = { responsive: true, displayModeBar: false, scrollZoom: false })
+    );
+
+    /// GENDER
+    var gender_trace1 = {
+      y: ["Climbers"],
+      x: [selectedPeak.properties.count_mem_try_female],
+      text:
+        parseFloat(
+          (selectedPeak.properties.count_mem_try_female /
+            selectedPeak.properties.count_mem_try) *
+            100
+        ).toFixed(2) + "%",
+      textposition: "inside",
+      name: "Female",
+      type: "bar",
+      marker: {
+        color: "rgb(55, 83, 109)",
+      },
+      orientation: "h",
+    };
+
+    var gender_trace2 = {
+      y: ["Climbers"],
+      x: [
+        selectedPeak.properties.count_mem_try -
+          selectedPeak.properties.count_mem_try_female,
+      ],
+      text:
+        parseFloat(
+          (1 -
+            selectedPeak.properties.count_mem_try_female /
+              selectedPeak.properties.count_mem_try) *
+            100
+        ).toFixed(2) + "%",
+      textposition: "inside",
+      name: "Male",
+      type: "bar",
+      marker: {
+        color: "rgb(26, 118, 255)",
+      },
+      orientation: "h",
+    };
+
+    var gender_data = [gender_trace1, gender_trace2];
+
+    var gender_layout = {
+      showlegend: true,
+      barmode: "stack",
+      xaxis: {
+        showgrid: false,
+        zeroline: false,
+        visible: false,
+        showspikes: false,
+      },
+      yaxis: {
+        showgrid: false,
+        zeroline: false,
+        visible: false,
+        showspikes: false,
+      },
+      legend: {
+        orientation: "h",
+        y: 0,
+      },
+      hovermode: "y unified",
+      margin: {
+        l: 20,
+        r: 20,
+        b: 0,
+        t: 15,
       },
     };
 
-    TESTER = document.getElementById("time-plot");
-    Plotly.newPlot("time-plot", data, layout);
+    Plotly.newPlot(
+      "gender-plot",
+      gender_data,
+      gender_layout,
+      (config = { responsive: true, displayModeBar: false, scrollZoom: false })
+    );
+
+    //// AGE DISTRIBUTION
+
+    var bar_trace = {
+      x: Object.keys(selectedPeak.properties.age_histogram),
+      y: Object.values(selectedPeak.properties.age_histogram),
+      type: "bar",
+      marker: {
+        color: "rgb(26, 118, 255)",
+      },
+    };
+    var age_data = [bar_trace];
+    var age_layout = {
+      legend: {
+        orientation: "h",
+        y: 0,
+      },
+      hovermode: "x unified",
+      margin: {
+        l: 30,
+        r: 30,
+        b: 55,
+        t: 15,
+      },
+    };
+    Plotly.newPlot(
+      "age-plot",
+      age_data,
+      age_layout,
+      (config = { responsive: true, displayModeBar: false, scrollZoom: false })
+    );
   }
 }
 
@@ -388,7 +521,7 @@ function setSidebarData(selectedPeak) {
 function Top5Story(rank) {
   map_rank_id = { 1: "EVER", 2: "KANG", 3: "LHOT", 4: "YALU", 5: "MAKA" };
 
-  $.getJSON("/Himalayan Database/GeoData/peaks.geojson", function (data) {
+  $.getJSON("/assets/data/peaks.geojson", function (data) {
     var selectedPeak = data.features.filter(
       (el) => el.properties.peakid == map_rank_id[rank]
     )[0];
@@ -418,10 +551,33 @@ function Top5Story(rank) {
 
 /// Screenshot
 $("#download-screen-shot").click(function () {
-  console.log("hahi");
+  console.log("download");
   var img = map.getCanvas().toDataURL("image/png");
   this.href = img;
 });
+
+/// Locate button
+document.getElementById("fly-button").onclick = function () {
+  var coords = document.getElementById("fly-button").dataset.location;
+  map.easeTo({
+    center: coords.split(","),
+    pitch: 60,
+    zoom: 12,
+    // bearing: -60,
+    duration: 4000,
+  });
+};
+
+/// Plotly resizer when stats tab appears to make sure it is sized properly
+var targetNode = document.getElementById("pills-stats");
+var observer = new MutationObserver(function () {
+  if (targetNode.style.display != "none") {
+    Plotly.Plots.resize("time-plot");
+    Plotly.Plots.resize("gender-plot");
+    Plotly.Plots.resize("age-plot");
+  }
+});
+observer.observe(targetNode, { attributes: true, childList: true });
 
 //// ADD FLAG
 //https://krikienoid.github.io/flagwaver/
