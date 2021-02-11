@@ -62,7 +62,7 @@ map.on("load", function () {
 
   ///////// ADD PEAKS
   map.loadImage(
-    "http://127.0.0.1:5500/assets/images/newMarker.png",
+    "./assets/images/newMarker.png",
     // Add an image to use as a custom marker
     function (error, image) {
       if (error) throw error;
@@ -70,7 +70,7 @@ map.on("load", function () {
 
       map.addSource("peaks", {
         type: "geojson",
-        data: "http://127.0.0.1:5500/assets/data/peaks.geojson",
+        data: "./assets/data/peaks.geojson",
       });
 
       // Add a layer showing the peaks.
@@ -126,12 +126,12 @@ map.on("load", function () {
     var id = e.features[0].properties.peakid;
     popupClick.setLngLat(coordinates).setHTML("click").addTo(map);
     /// Mapbox not giving the array format properties as array so I need to request the data angain to get it in the proper format
-    $.getJSON("/assets/data/peaks.geojson", function (data) {
+    $.getJSON("./assets/data/peaks.geojson", function (data) {
       var selectedPeak = data.features.filter(
         (el) => el.properties.peakid == id
       )[0];
 
-      ToggleToolBox(true);
+      ToggleToolBox(true,resizePlots);
       setSidebarData(selectedPeak);
     });
   });
@@ -178,7 +178,7 @@ map.once("idle", () => {
 //////////////// Depreciated markers
 
 // $.getJSON(
-//     "http://127.0.0.1:5500/assets/data/peaks.geojson",
+//     "./assets/data/peaks.geojson",
 //     function (data) {
 //       var geojson = data; // JSON result in `data` variable
 //       geojson.features.forEach(function (marker) {
@@ -187,7 +187,7 @@ map.once("idle", () => {
 //         el.className = "marker";
 //         //el.style.backgroundColor = "white";
 //         el.style.backgroundImage =
-//           "url('http://127.0.0.1:5500/assets/images/marker_peak_blue.png')";
+//           "url('./assets/images/marker_peak_blue.png')";
 //         el.innerHTML = "<span>" + marker.properties.heightm + "m" + "</span/>";
 
 //         var popup = new mapboxgl.Popup({ offset: 25, closeButton: false, closeOnClick: false }).setText(
@@ -247,14 +247,8 @@ var toolbar_header = document.getElementById("toolbar-header");
 var toolbar_button = document.getElementById("toolbar-button");
 var location_search = document.getElementById("location-search-container");
 
-document.getElementById("toolbar-button").onclick = function () {
-  ToggleToolBox();
-  Plotly.Plots.resize("time-plot");
-  Plotly.Plots.resize("gender-plot");
-  Plotly.Plots.resize("age-plot");
-};
 ///// TOGGLE
-function ToggleToolBox(forceOpen) {
+function ToggleToolBox(forceOpen, func) {
   if (forceOpen == true) {
     toolbar.style.display = "block";
     toolbar_button.className = "active";
@@ -270,6 +264,7 @@ function ToggleToolBox(forceOpen) {
       location_search.className = "location-search-toolbox-active";
     }
   }
+  func();
 }
 
 //// SET SIDEBAR - TOOLBAR
@@ -596,12 +591,18 @@ document.getElementById("fly-button").onclick = function () {
 var targetNode = document.getElementById("pills-stats");
 var observer = new MutationObserver(function () {
   if (targetNode.style.display != "none") {
-    Plotly.Plots.resize("time-plot");
-    Plotly.Plots.resize("gender-plot");
-    Plotly.Plots.resize("age-plot");
+    resizePlots();
   }
 });
 observer.observe(targetNode, { attributes: true, childList: true });
+
+
+function resizePlots(){
+  Plotly.Plots.resize("time-plot");
+  Plotly.Plots.resize("gender-plot");
+  Plotly.Plots.resize("age-plot");
+}
+
 
 //// ADD FLAG
 //https://krikienoid.github.io/flagwaver/
@@ -637,3 +638,18 @@ observer.observe(targetNode, { attributes: true, childList: true });
 
 //   circle.classList.add('ripple');
 // }
+ 
+function filterHeight(height){
+  $.getJSON("./assets/data/peaks.geojson", function (data) {
+    var filtered_data = data.features.filter(element => {
+      let filter = element.properties.heightm > height ? true : false;
+      return filter
+  });
+    filtered_data = { features: filtered_data, type: "FeatureCollection" }
+    map.getSource('peaks').setData(filtered_data);
+  });
+};
+//activate button
+$(".btn-group-vertical > .btn").click(function(){
+  $(this).addClass("active").siblings().removeClass("active");
+});

@@ -58,7 +58,7 @@
           class="d-inline-block align-top"
           alt=""
         />
-        Himalayas Map</a
+        Himalayas</a
       >
       <button
         class="navbar-toggler"
@@ -77,8 +77,11 @@
           <a class="nav-item nav-link active" href="#"
             >Map <span class="sr-only">(current)</span></a
           >
-          <a class="nav-item nav-link" href="#">About</a>
-          <a class="nav-item nav-link" target="_blank" href="https://github.com/botivegh"
+          <!-- <a class="nav-item nav-link" href="#">About</a> -->
+          <a
+            class="nav-item nav-link"
+            target="_blank"
+            href="https://github.com/botivegh"
             ><i class="fab fa-github"></i
           ></a>
         </div>
@@ -93,9 +96,8 @@
         <div>Loading...</div>
       </div>
 
-
       <!-- TOOLBAR -->
-      <div id="toolbar-button"></div>
+      <div id="toolbar-button" onclick="ToggleToolBox(false,resizePlots)"></div>
 
       <div id="toolbar" class="toolbar enableBlur">
         <!-- IMAGE -->
@@ -132,7 +134,7 @@
             >
               <li class="nav-item">
                 <a
-                  class="nav-link  active"
+                  class="nav-link active"
                   id="pills-stats-tab"
                   data-toggle="pill"
                   href="#pills-stats"
@@ -272,7 +274,7 @@
         <!-- TOP 5 STORYTELLER -->
 
         <div id="top5-container">
-          <span id="top5er-badge" class="badge badge-dark">Top 5</span>
+          <!-- <span id="top5er-badge" class="badge badge-dark">Top 5</span> -->
           <!-- first -->
           <div class="top5er" onclick="Top5Story(1)">
             <div
@@ -323,6 +325,21 @@
         <a id="download-screen-shot" download="HimalayasMap_screenshot.png">
           <i class="fas fa-camera"></i
         ></a>
+        <!-- height Filter -->
+        <div id="height-filter" class="btn-group-vertical" role="group">
+          <button type="button" class="btn btn active" onclick="filterHeight(0)">
+            All
+          </button>
+          <button type="button" class="btn btn" onclick="filterHeight(8000)">
+            8000m+
+          </button>
+          <button type="button" class="btn btn" onclick="filterHeight(7000)">
+            7000m+
+          </button>
+          <button type="button" class="btn btn" onclick="filterHeight(6000)">
+            6000m+
+          </button>
+        </div>
 
         <div id="map"></div>
       </div>
