@@ -233,8 +233,8 @@ document.getElementById("location-search").onchange = function () {
       var selectedPeak = data.features.filter(
         (el) => el.properties.peakid == selected.split(",")[2]
       )[0];
-      ToggleToolBox(true);
-      setSidebarData(selectedPeak);
+      ToggleToolBox(true, resizePlots);
+      setSidebarData(selectedPeak, resizePlots);
     });
   }
 };
@@ -404,6 +404,8 @@ function setSidebarData(selectedPeak) {
       legend: {
         orientation: "h",
       },
+      yaxis: {fixedrange: true},
+      xaxis : {fixedrange: true},
       margin: {
         l: 30,
         r: 30,
@@ -468,12 +470,14 @@ function setSidebarData(selectedPeak) {
         showgrid: false,
         zeroline: false,
         visible: false,
+        fixedrange: true,
         showspikes: false,
       },
       yaxis: {
         showgrid: false,
         zeroline: false,
         visible: false,
+         fixedrange: true,
         showspikes: false,
       },
       legend: {
@@ -508,6 +512,8 @@ function setSidebarData(selectedPeak) {
     };
     var age_data = [bar_trace];
     var age_layout = {
+      yaxis: {fixedrange: true},
+      xaxis : {fixedrange: true},
       legend: {
         orientation: "h",
         y: 0,
@@ -539,12 +545,11 @@ function Top5Story(rank, first) {
     var selectedPeak = data.features.filter(
       (el) => el.properties.peakid == map_rank_id[rank]
     )[0];
-    console.log(first);
     if (first == true) {
       setSidebarData(selectedPeak);
     } else {
       setSidebarData(selectedPeak);
-      ToggleToolBox(true);
+      ToggleToolBox(true, resizePlots);
     }
     map.easeTo({
       center: selectedPeak.geometry.coordinates,
